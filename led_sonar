@@ -1,0 +1,56 @@
+#define echoPin 7
+#define trigPin 8
+#define negLED 4
+#define posLED 5
+
+float duration;
+float distance;
+
+void setup() {
+  Serial.begin(9600);
+  //Defining input/output pins - LED pins are output because no data is beign collected
+  pinMode(echoPin, INPUT);
+  pinMode(trigPin, OUTPUT);
+  pinMode(negLED, OUTPUT);
+  pinMode(posLED, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+
+  digitalWrite(trigPin, LOW);
+
+//resetting LED pins both to LOW so that indicator works properly
+  digitalWrite(negLED, LOW);
+  digitalWrite(posLED, LOW);
+
+  duration = pulseIn(echoPin, HIGH);
+
+  //distance in centimeters
+  distance = 172 * duration / (pow(10, 4));
+
+  //'if' function that instructs arduino to trigger the posLED pin to high ('on'); if not keep it to low ('off'). Using posLED because when negLED was used, the LED wouldn't trigger (distance to trigger LED is 20 cm)
+  if (distance < 20) {
+    digitalWrite(posLED, HIGH);
+  } else {
+    digitalWrite(posLED, LOW);
+  }
+
+  Serial.print(distance);
+  Serial.print(" cm, ");
+    //below is distance in inches
+  Serial.print(distance / 2.54);
+  Serial.print(" in");
+  Serial.println();
+
+  delay(100);
+}
+
+//100 ohm resistor being used between LED and jumper cable to arduino
+//Sensor is HC-SR04
+//Arduino Uno R3
+//Two seperate 'circuits' - one for sensor, and one for LED
